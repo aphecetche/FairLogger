@@ -44,7 +44,7 @@ function(get_git_version)
     execute_process(COMMAND ${GIT_EXECUTABLE} describe --tags --dirty --match "v*"
       OUTPUT_VARIABLE ${ARGS_OUTVAR_PREFIX}_GIT_VERSION
       OUTPUT_STRIP_TRAILING_WHITESPACE
-      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
     if(${ARGS_OUTVAR_PREFIX}_GIT_VERSION)
       # cut first two characters "v-"

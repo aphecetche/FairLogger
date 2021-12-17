@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.9.4 FATAL_ERROR)
 cmake_policy(VERSION 3.9...3.19)
 
 # Project ######################################################################
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include(FairLoggerLib)
 include(FairFindPackage2)
 
@@ -39,7 +39,9 @@ if(USE_BOOST_PRETTY_FUNCTION)
 endif()
 
 if(USE_EXTERNAL_FMT)
-  find_package2(PUBLIC fmt REQUIRED VERSION 5.3.0)
+  if(NOT TARGET fmt::fmt)
+        find_package2(PUBLIC fmt REQUIRED VERSION 5.3.0)
+  endif()
 endif()
 ################################################################################
 
@@ -55,6 +57,7 @@ add_library(FairLogger
   logger/Logger.h
 )
 target_compile_features(FairLogger PUBLIC cxx_std_14)
+add_library(FairLogger::FairLogger ALIAS FairLogger)
 
 if(USE_BOOST_PRETTY_FUNCTION)
   target_link_libraries(FairLogger PUBLIC Boost::boost)
@@ -80,7 +83,7 @@ endif()
 
 target_include_directories(FairLogger
   PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/logger>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/logger>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 set_target_properties(FairLogger PROPERTIES
@@ -139,7 +142,8 @@ if(NOT USE_EXTERNAL_FMT)
   )
 endif()
 
-install_cmake_package()
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+  install_cmake_package()
 ################################################################################
 
 # Testing ######################################################################
@@ -154,6 +158,8 @@ if(BUILD_TESTING)
   add_test(NAME verbosity COMMAND $<TARGET_FILE:verbosityTest>)
 endif()
 ################################################################################
+
+endif()
 
 # Utils ########################################################################
 find_program(BASH bash HINTS "/bin")
